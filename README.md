@@ -9,7 +9,7 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'measure'
+gem "measure", github: "bluerabbit/measure"
 ```
 
 And then execute:
@@ -22,7 +22,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+# array = [] # in memory array
+array = Redis::List.new('redis_key')
+measure = Measure.new(array)
+measure.audit('action1') { sleep 1 } 
+measure.audit('action1') { sleep 2 }
+measure.audit('action2') { sleep 1 }
+
+measure.results(sort_key: :sum) # [{action_name: action1, count: 2, sum: 3, min: 1, max: 2, avg: 1.5},
+                                #  {action_name: action2, count: 1, sum: 1, min: 1, max: 1, avg: 1}]
+```
 
 ## Development
 
@@ -32,7 +42,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/measure.
+Bug reports and pull requests are welcome on GitHub at https://github.com/bluerabbit/measure.
 
 ## License
 
