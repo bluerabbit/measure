@@ -8,13 +8,16 @@ class Measure
   end
 
   def audit(action_name)
-    start_time = Time.now
-    begin
-      yield
-    ensure
-      time_sec = Time.now - start_time
-      @list << { action_name: action_name, time_sec: time_sec }.to_json
+    audit = Measure::Audit.new(action_name: action_name, list: @list)
+    if block_given?
+      begin
+        audit.start
+        return yield
+      ensure
+        audit.stop
+      end
     end
+    audit
   end
 
   def results(sort_key: :sum)
@@ -49,5 +52,25 @@ class Measure
   # ex) [{action_name: 'hoge', time_sec: 1.1}]
   def rows
     @list.map { |json| JSON.parse(json) }
+  end
+
+  class Audit
+    def initialize(action_name:, list:)
+      @action_name = action_name
+      @list        = list
+    end
+
+    def start
+      @start_time = Time.now
+      self
+    end
+
+    def stop
+      @end_time = Time.now
+      time_sec  = @end_time - @start_time
+      h = { action_name: @action_name, time_sec: time_sec }
+      @list << h.to_json
+      h
+    end
   end
 end
