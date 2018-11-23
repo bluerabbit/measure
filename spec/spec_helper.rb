@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'pry-byebug'
+require 'fakeredis/rspec'
 require 'measure'
 
 RSpec.configure do |config|

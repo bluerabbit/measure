@@ -8,14 +8,9 @@ RSpec.describe Measure do
       @measure = Measure.new(Redis::List.new('namespace'))
     end
 
-    after do
-      @measure.reset
-    end
-
     it do
       @measure.audit('action1') { sleep 1 }
       @measure.audit('action1') { sleep 2 }
-
       rows = @measure.results
       expect(rows.size).to eq(1)
 
