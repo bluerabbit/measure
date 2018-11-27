@@ -4,11 +4,21 @@ require 'measure/version'
 
 class Measure
   def initialize(list)
-    @list = list
+    @list   = list
+    @enable = true
+  end
+
+  def disabled!
+    @enable = false
+  end
+
+  def enable!
+    @enable = true
   end
 
   def audit(action_name)
-    audit = Measure::Audit.new(action_name: action_name, list: @list)
+    audit = build_audit(action_name)
+
     if block_given?
       begin
         audit.start
@@ -18,6 +28,14 @@ class Measure
       end
     end
     audit
+  end
+
+  def build_audit(action_name)
+    if @enable
+      Measure::Audit.new(action_name: action_name, list: @list)
+    else
+      Measure::AuditNullObject.new
+    end
   end
 
   def results(sort_key: :sum)
@@ -71,6 +89,18 @@ class Measure
       h = { action_name: @action_name, time_sec: time_sec }
       @list << h.to_json
       h
+    end
+  end
+
+  class AuditNullObject
+    def initialize()
+    end
+
+    def start
+      self
+    end
+
+    def stop
     end
   end
 end

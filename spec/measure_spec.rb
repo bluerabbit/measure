@@ -49,5 +49,17 @@ RSpec.describe Measure do
       expect(rows[0][:action_name]).to eq('action1')
       expect(rows[0][:sum].to_i).to eq(1)
     end
+
+    it do
+      @measure.disabled!
+      audit = @measure.audit('action1').start
+      sleep 0.1
+      audit.stop
+
+      @measure.audit('action2') { sleep 0.1 }
+
+      rows = @measure.results
+      expect(rows.size).to eq(0)
+    end
   end
 end
